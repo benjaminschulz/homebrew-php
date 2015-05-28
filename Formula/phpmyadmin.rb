@@ -1,30 +1,16 @@
 require 'formula'
 
-def php55_installed?
-  `php -v`.match(/5\.5\./)
-end
-
-def php54_installed?
-  `php -v`.match(/5\.4\./)
-end
-
-def php53_installed?
-  `php -v`.match(/5\.3\./)
-end
-
 class Phpmyadmin < Formula
   homepage 'http://www.phpmyadmin.net'
-  url 'http://downloads.sourceforge.net/project/phpmyadmin/phpMyAdmin/4.0.4/phpMyAdmin-4.0.4-all-languages.tar.bz2'
-  sha1 '572cf575af7dc05a419c2aad71796d44175a3501'
+  url 'https://github.com/phpmyadmin/phpmyadmin/archive/RELEASE_4_4_4.tar.gz'
+  sha256 '1fc8f6e9229f22920b06d27fda63ad39c906bd11e76d555d03f8878e9800627f'
+  head 'https://github.com/phpmyadmin/phpmyadmin.git'
 
-  if build.include?('without-mcrypt') && MacOS.prefer_64_bit?
-    raise "64-bit machines cannot use phpmyadmin without mcrypt"
-  end
-
-  unless build.include? 'without-mcrypt'
-    depends_on 'php53-mcrypt' if php53_installed?
-    depends_on 'php54-mcrypt' if php54_installed?
-    depends_on 'php55-mcrypt' if php55_installed?
+  if build.with? 'mcrypt'
+    depends_on "php53-mcrypt" if Formula['php53'].linked_keg.exist?
+    depends_on "php54-mcrypt" if Formula['php54'].linked_keg.exist?
+    depends_on "php55-mcrypt" if Formula['php55'].linked_keg.exist?
+    depends_on "php56-mcrypt" if Formula['php56'].linked_keg.exist?
   end
 
   unless MacOS.prefer_64_bit?
@@ -33,6 +19,11 @@ class Phpmyadmin < Formula
 
   def install
     (share+'phpmyadmin').install Dir['*']
+
+    if !(File.exists?(etc+'phpmyadmin.config.inc.php'))
+      cp (share+'phpmyadmin/config.sample.inc.php'), (etc+'phpmyadmin.config.inc.php')
+    end
+    ln_s (etc+'phpmyadmin.config.inc.php'), (share+'phpmyadmin/config.inc.php')
   end
 
   def caveats; <<-EOS.undent
@@ -46,17 +37,23 @@ class Phpmyadmin < Formula
       <Directory #{HOMEBREW_PREFIX}/share/phpmyadmin/>
         Options Indexes FollowSymLinks MultiViews
         AllowOverride All
-        Order allow,deny
-        Allow from all
+        <IfModule mod_authz_core.c>
+          Require all granted
+        </IfModule>
+        <IfModule !mod_authz_core.c>
+          Order allow,deny
+          Allow from all
+        </IfModule>
       </Directory>
     Then, open http://localhost/phpmyadmin
 
-    More documentation : file://#{share}/phpmyadmin/Documentation.html
-    
-    Don't forget to copy config.sample.inc.php to config.inc.php and :
+    More documentation : file://#{share}/phpmyadmin/doc/
+
+    Configuration has been copied to #{etc}/phpmyadmin.config.inc.php
+    Don't forget to:
       - change your secret blowfish
       - uncomment the configuration lines (pma, pmapass ...)
-    
+
     EOS
   end
 end

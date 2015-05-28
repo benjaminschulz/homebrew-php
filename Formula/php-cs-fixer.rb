@@ -1,33 +1,29 @@
-require 'formula'
-require File.expand_path("../../Requirements/php-meta-requirement", Pathname.new(__FILE__).realpath)
-require File.expand_path("../../Requirements/phar-requirement", Pathname.new(__FILE__).realpath)
-require File.expand_path("../../Requirements/phar-building-requirement", Pathname.new(__FILE__).realpath)
+require File.expand_path("../../Requirements/php-meta-requirement", __FILE__)
+require File.expand_path("../../Requirements/phar-requirement", __FILE__)
+require File.expand_path("../../Requirements/phar-building-requirement", __FILE__)
 
 class PhpCsFixer < Formula
-  homepage 'http://cs.sensiolabs.org'
-  url 'https://github.com/fabpot/PHP-CS-Fixer/archive/v0.2.0.tar.gz'
-  sha1 'b656560c28b31da179b1a4a53a23b9e356d582ff'
-  head 'https://github.com/fabpot/PHP-CS-Fixer.git'
+  homepage "http://cs.sensiolabs.org"
+  url "https://github.com/FriendsOfPHP/PHP-CS-Fixer/archive/v1.7.tar.gz"
+  sha256 "702a52611733065f94860048f13925b8f4c0571fa6c2fe5e682e4d5377841a73"
+  head "https://github.com/FriendsOfPHP/PHP-CS-Fixer.git"
 
-  def self.init
-    depends_on PhpMetaRequirement
-    depends_on PharRequirement
-    depends_on PharBuildingRequirement
-    depends_on "composer"
-    depends_on "php53" if Formula.factory("php53").linked_keg.exist?
-    depends_on "php54" if Formula.factory("php54").linked_keg.exist?
-    depends_on "php55" if Formula.factory("php55").linked_keg.exist?
- end
-
-  init
+  depends_on PhpMetaRequirement
+  depends_on PharRequirement
+  depends_on PharBuildingRequirement
+  depends_on "composer"
+  depends_on "php53" if Formula['php53'].linked_keg.exist?
+  depends_on "php54" if Formula['php54'].linked_keg.exist?
+  depends_on "php55" if Formula['php55'].linked_keg.exist?
+  depends_on "php56" if Formula['php56'].linked_keg.exist?
 
   def install
-    File.open("genphar.php", 'w') {|f| f.write(phar_stub) }
+    File.open("genphar.php", "w") {|f| f.write(phar_stub) }
 
-    cmd = [
+    [
       "mkdir -p src",
       "rsync -a --exclude 'src' . src/",
-      "cd src && /usr/bin/env php -d allow_url_fopen=On -d detect_unicode=Off  #{Formula.factory('composer').libexec}/composer.phar install",
+      "cd src && /usr/bin/env php -d allow_url_fopen=On -d detect_unicode=Off  #{Formula['composer'].libexec}/composer.phar install",
       "cd src && sed -i '' '1d' php-cs-fixer",
       "php -f genphar.php",
     ].each { |c| `#{c}` }
@@ -39,8 +35,8 @@ class PhpCsFixer < Formula
     bin.install_symlink sh
   end
 
-  def test
-    system 'php-cs-fixer --version'
+  test do
+    system "php-cs-fixer", "--version"
   end
 
   def phar_stub

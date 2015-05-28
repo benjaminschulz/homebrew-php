@@ -1,11 +1,11 @@
-require File.join(File.dirname(__FILE__), 'abstract-php-extension')
+require File.expand_path("../../Abstract/abstract-php-extension", __FILE__)
 
 class Php53Solr < AbstractPhp53Extension
   init
   homepage 'http://pecl.php.net/package/solr'
-  url 'http://pecl.php.net/get/solr-1.0.2.tgz'
-  sha1 '2412c77bd86e70bfcd25473a7ed70e4631ffafcc'
-  head 'https://svn.php.net/repository/pecl/solr/trunk/'
+  url 'http://pecl.php.net/get/solr-2.1.0.tgz'
+  sha1 'd7bb1ca0edc22bf83bf644bc5ab30d9d9fec59c7'
+  head 'http://svn.apache.org/repos/asf/lucene/dev/trunk/'
 
   def install
     Dir.chdir "solr-#{version}" unless build.head?
@@ -13,10 +13,9 @@ class Php53Solr < AbstractPhp53Extension
     ENV.universal_binary if build.universal?
 
     safe_phpize
-    system "./configure", "--prefix=#{prefix}",
-                          phpconfig
+    system "./configure", "--prefix=#{prefix}", phpconfig
     system "make"
     prefix.install "modules/solr.so"
-    write_config_file unless build.include? "without-config-file"
+    write_config_file if build.with? "config-file"
   end
 end

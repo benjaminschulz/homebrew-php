@@ -1,13 +1,20 @@
-require File.join(File.dirname(__FILE__), 'abstract-php-extension')
+require File.expand_path("../../Abstract/abstract-php-extension", __FILE__)
 
 class Php54Pspell < AbstractPhp54Extension
   init
-  homepage 'http://php.net/manual/en/book.pspell.php'
-  url 'http://www.php.net/get/php-5.4.19.tar.bz2/from/this/mirror'
-  sha1 '465f4cd1f8a0fec3c63b79b229bc3893770e2d0b'
-  version '5.4.19'
+  homepage "http://php.net/manual/en/book.pspell.php"
+  url      PHP_SRC_TARBALL
+  sha256   PHP_CHECKSUM[:sha256]
+  version  PHP_VERSION
 
-  depends_on 'aspell'
+  bottle do
+    root_url "https://homebrew.bintray.com/bottles-php"
+    sha256 "b57274f3d6d34a9ad46e19270cef269739572cc7640b2de08f11d6d6118f4054" => :yosemite
+    sha256 "fcf636c13ea245f789d12676955791a1f23b13cfbd8fba62c41956bfbe7d51bc" => :mavericks
+    sha256 "dac33e3af589dd90df82cd20fb9fd76b3a4a07c53abc8840b98aa153160ba3ac" => :mountain_lion
+  end
+
+  depends_on "aspell"
 
   def install
     Dir.chdir "ext/pspell"
@@ -18,9 +25,9 @@ class Php54Pspell < AbstractPhp54Extension
     system "./configure", "--prefix=#{prefix}",
                           phpconfig,
                           "--disable-debug",
-                          "--with-pspell=#{Formula.factory('aspell').opt_prefix}"
+                          "--with-pspell=#{Formula['aspell'].opt_prefix}"
     system "make"
     prefix.install "modules/pspell.so"
-    write_config_file unless build.include? "without-config-file"
+    write_config_file if build.with? "config-file"
   end
 end

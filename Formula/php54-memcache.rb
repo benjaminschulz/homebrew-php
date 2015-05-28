@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'abstract-php-extension')
+require File.expand_path("../../Abstract/abstract-php-extension", __FILE__)
 
 class Php54Memcache < AbstractPhp54Extension
   init
@@ -8,8 +8,8 @@ class Php54Memcache < AbstractPhp54Extension
   head 'https://svn.php.net/repository/pecl/memcache/trunk/'
 
   devel do
-    url 'http://pecl.php.net/get/memcache-3.0.7.tgz'
-    sha1 'bd5df709eb9c6dabdcd8886b76eca18cbfa6fa3f'
+    url 'http://pecl.php.net/get/memcache-3.0.8.tgz'
+    sha1 '681ece0258958d60902d6bbf0cf1f2171a0cc47c'
   end
 
   def install
@@ -22,6 +22,6 @@ class Php54Memcache < AbstractPhp54Extension
                           phpconfig
     system "make"
     prefix.install "modules/memcache.so"
-    write_config_file unless build.include? "without-config-file"
+    write_config_file if build.with? "config-file"
   end
 end

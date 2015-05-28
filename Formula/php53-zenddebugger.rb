@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'abstract-php-extension')
+require File.expand_path("../../Abstract/abstract-php-extension", __FILE__)
 
 class Php53Zenddebugger < AbstractPhp53Extension
   init
@@ -13,16 +13,12 @@ class Php53Zenddebugger < AbstractPhp53Extension
     version '20110410'
   end
 
-  skip_clean :all
-
   def extension_type; "zend_extension"; end
-
-  option '32-bit', "Build 32-bit only."
 
   def install
     prefix.install "5_3_x_comp/ZendDebugger.so"
     prefix.install "dummy.php"
-    write_config_file unless build.include? "without-config-file"
+    write_config_file if build.with? "config-file"
   end
 
   def config_file

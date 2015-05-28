@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'abstract-php-extension')
+require File.expand_path("../../Abstract/abstract-php-extension", __FILE__)
 
 class Php54Xhprof < AbstractPhp54Extension
   init
@@ -7,6 +7,13 @@ class Php54Xhprof < AbstractPhp54Extension
   sha1 'bab248d9a44a99515f96eb086bfa9d8932874451'
   head 'https://github.com/facebook/xhprof.git'
   version '254eb24'
+
+  bottle do
+    root_url "https://homebrew.bintray.com/bottles-php"
+    sha1 "61d745f801e920032ddb60f6435930f3b98b00a4" => :yosemite
+    sha1 "95353e32a80594275f71bd952d633299cb893fc5" => :mavericks
+    sha1 "166aaa596955aac2396947942f4f1b3bd0857c0c" => :mountain_lion
+  end
 
   depends_on 'pcre'
 
@@ -22,6 +29,6 @@ class Php54Xhprof < AbstractPhp54Extension
     end
 
     prefix.install %w(xhprof_html xhprof_lib)
-    write_config_file unless build.include? "without-config-file"
+    write_config_file if build.with? "config-file"
   end
 end

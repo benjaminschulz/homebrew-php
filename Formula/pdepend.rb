@@ -1,34 +1,23 @@
-require 'formula'
-require File.expand_path("../../Requirements/php-meta-requirement", Pathname.new(__FILE__).realpath)
-require File.expand_path("../../Requirements/phar-requirement", Pathname.new(__FILE__).realpath)
+require File.expand_path("../../Requirements/php-meta-requirement", __FILE__)
+require File.expand_path("../../Requirements/phar-requirement", __FILE__)
 
 class Pdepend < Formula
-  homepage 'http://pdepend.org/'
-  url 'http://static.pdepend.org/php/1.1.0/pdepend.phar'
-  sha1 'd91fb76e03160bbe957078e95cbf88cb47cdf132'
-  version '1.1.0'
+  homepage "http://pdepend.org/"
+  url "http://static.pdepend.org/php/2.0.6/pdepend.phar"
+  sha256 "71573a4b125a5e1ca42032af52095b2d96a39aafb26704529549c42d6833bf4f"
 
   depends_on PhpMetaRequirement
   depends_on PharRequirement
 
   def install
     libexec.install "pdepend.phar"
-    sh = libexec + "pdepend"
-    sh.write("#!/bin/sh\n\n/usr/bin/env php -d allow_url_fopen=On -d detect_unicode=Off #{libexec}/pdepend.phar $*")
-    chmod 0755, sh
-    bin.install_symlink sh
-  end
-
-  def test
-    system 'pdepend --version'
-  end
-
-  def caveats; <<-EOS.undent
-    Verify your installation by running:
-      "pdepend --version".
-
-    You can read more about pdepend by running:
-      "brew home pdepend".
+    (bin/"pdepend").write <<-EOS.undent
+      #!/bin/sh
+      /usr/bin/env php -d allow_url_fopen=On -d detect_unicode=Off #{libexec}/pdepend.phar $*
     EOS
+  end
+
+  test do
+    system bin/"pdepend", "--version"
   end
 end

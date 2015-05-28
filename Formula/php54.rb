@@ -1,31 +1,61 @@
-require File.join(File.dirname(__FILE__), 'abstract-php')
+require File.expand_path("../../Abstract/abstract-php", __FILE__)
 
 class Php54 < AbstractPhp
   init
-  url 'http://www.php.net/get/php-5.4.19.tar.bz2/from/this/mirror'
-  sha1 '465f4cd1f8a0fec3c63b79b229bc3893770e2d0b'
-  version '5.4.19'
+  include AbstractPhpVersion::Php54Defs
+  include AbstractPhpVersion::PhpdbgDefs
 
-  head 'https://github.com/php/php-src.git', :branch => 'PHP-5.4'
+  url     PHP_SRC_TARBALL
+  sha256  PHP_CHECKSUM[:sha256]
+  version PHP_VERSION
 
-  # Leopard requires Hombrew OpenSSL to build correctly
-  depends_on 'openssl' if MacOS.version == :leopard
+  head    PHP_GITHUB_URL, :branch => PHP_BRANCH
+
+  bottle do
+    root_url "https://homebrew.bintray.com/bottles-php"
+    sha256 "31dbf562d3a1aa595b4d09c69bae326de649528e0b171e27d410acb5b40bd3fd" => :yosemite
+    sha256 "d42d52a24741c5db5134ce99b0051c2286f4f2a59e303074932145f2eabe2e04" => :mavericks
+    sha256 "cd9bd3d0b59aa4fb8259fe342b8979d9295d16a5b2f4873d5b38ccd8fbff106f" => :mountain_lion
+  end
+
+  if build.with? "phpdbg"
+    # needed to regenerate the configure script
+    depends_on "autoconf" => :build
+    depends_on "re2c" => :build
+    depends_on "flex" => :build
+
+    resource "phpdbg" do
+      url    PHPDBG_SRC_TARBAL
+      sha256 PHPDBG_CHECKSUM[:sha256]
+    end
+  end
 
   def install_args
     args = super
-    args << "--with-homebrew-openssl" if MacOS.version == :leopard
-    args + [
-      "--enable-zend-signals",
-      "--enable-dtrace",
-    ]
+
+    # dtrace is not compatible with phpdbg: https://github.com/krakjoe/phpdbg/issues/38
+    args << "--enable-dtrace" if build.without? "phpdbg"
+
+    args << "--enable-zend-signals"
+  end
+
+  def _install
+    if build.with? "phpdbg"
+      resource("phpdbg").stage buildpath/"sapi/phpdbg"
+
+      # force the configure file to be rebuilt (needed to support phpdbg)
+      File.delete("configure")
+      system "./buildconf", "--force"
+    end
+
+    super
   end
 
   def php_version
-    5.4
+    "5.4"
   end
 
   def php_version_path
-    54
+    "54"
   end
-
 end

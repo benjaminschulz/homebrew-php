@@ -1,10 +1,10 @@
-require File.join(File.dirname(__FILE__), 'abstract-php-extension')
+require File.expand_path("../../Abstract/abstract-php-extension", __FILE__)
 
 class Php55Pthreads < AbstractPhp55Extension
   init ['with-thread-safety']
   homepage 'http://pecl.php.net/package/pthreads'
-  url 'http://pecl.php.net/get/pthreads-0.0.44.tgz'
-  sha1 'aef4e5e8dd6278f3cb3f997975406401cbce097f'
+  url 'http://pecl.php.net/get/pthreads-2.0.10.tgz'
+  sha1 'be2745b65ecf09190fb323ccbf168288c70cfd6c'
   head 'https://github.com/krakjoe/pthreads.git'
 
   def install
@@ -17,6 +17,6 @@ class Php55Pthreads < AbstractPhp55Extension
                           phpconfig
     system "make"
     prefix.install "modules/pthreads.so"
-    write_config_file unless build.include? "without-config-file"
+    write_config_file if build.with? "config-file"
   end
 end

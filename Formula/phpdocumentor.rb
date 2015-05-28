@@ -1,12 +1,12 @@
 require 'formula'
-require File.expand_path("../../Requirements/php-meta-requirement", Pathname.new(__FILE__).realpath)
-require File.expand_path("../../Requirements/phar-requirement", Pathname.new(__FILE__).realpath)
+require File.expand_path("../../Requirements/php-meta-requirement", __FILE__)
+require File.expand_path("../../Requirements/phar-requirement", __FILE__)
 
 class Phpdocumentor < Formula
   homepage 'http://www.phpdoc.org'
-  url 'http://www.phpdoc.org/phpDocumentor.phar'
-  sha1 '7d58469ee7d55c3c0e5cfc822cc4735d1b59258b'
-  version '2.0.1'
+  url 'https://github.com/phpDocumentor/phpDocumentor2/releases/download/v2.8.2/phpDocumentor.phar'
+  sha1 'ea34a615c176ff158c684fdc78cde4b85775843b'
+  version '2.8.2'
 
   depends_on PhpMetaRequirement
   depends_on PharRequirement

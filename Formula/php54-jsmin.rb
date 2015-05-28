@@ -1,11 +1,17 @@
-require File.join(File.dirname(__FILE__), 'abstract-php-extension')
+require File.expand_path("../../Abstract/abstract-php-extension", __FILE__)
 
-class Php54Jsmin < AbstractPhp53Extension
+class Php54Jsmin < AbstractPhp54Extension
   init
   homepage 'http://pecl.php.net/package/jsmin'
-  url 'http://pecl.php.net/get/jsmin-0.1.0.tgz'
-  sha1 '0cc709e7ef6728535905a3a7492bf2347244a30f'
+  url 'http://pecl.php.net/get/jsmin-1.1.0.tgz'
+  sha1 'e081d7c66a9401b9cd8b0ad585f357a4d7e335ef'
   head 'https://github.com/sqmk/pecl-jsmin.git'
+
+  bottle do
+    root_url "https://homebrew.bintray.com/bottles-php"
+    sha1 "6b2c63b73c486b9e1d3f2165498a0e897da9fd4a" => :yosemite
+    sha1 "f5de153627229dec97dcd3df695f2514fa3942f1" => :mountain_lion
+  end
 
   def install
     Dir.chdir "jsmin-#{version}" unless build.head?
@@ -17,6 +23,6 @@ class Php54Jsmin < AbstractPhp53Extension
                           phpconfig
     system "make"
     prefix.install "modules/jsmin.so"
-    write_config_file unless build.include? "without-config-file"
+    write_config_file if build.with? "config-file"
   end
 end
